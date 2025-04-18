@@ -100,6 +100,7 @@ int main(void)
 
   /* USER CODE BEGIN 2 */
   HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_2);  // Start PWM for Servo
+  uint8_t doorState = 0;
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -108,27 +109,32 @@ int main(void)
   {
 
 	  if (HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0) == GPIO_PIN_RESET) // Active LOW: Presence detected
-	      {
-	          // Open door
-	          __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 75); // ~1.5ms pulse width
-	          SSD1306_Clear();
-	          SSD1306_GotoXY(10, 20);
-	          SSD1306_Puts("Door Open", &Font_11x18, 1);
-	          SSD1306_UpdateScreen();
-	          HAL_Delay(1000);
-	      }
-	      else
-	      {
-	          // Close door
-	          __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 25); // ~0.5ms pulse width
-	          SSD1306_Clear();
-	          SSD1306_GotoXY(10, 20);
-	          SSD1306_Puts("Door Closed", &Font_11x18, 1);
-	          SSD1306_UpdateScreen();
-	          HAL_Delay(1000);
-	      }
-    /* USER CODE END WHILE */
-
+	  	      {
+	  	          // Open door
+	  	          __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 250); // ~1.5ms pulse width
+	  	          SSD1306_Clear();
+	  	          SSD1306_GotoXY(10, 20);
+	  	          SSD1306_Puts("Door Open", &Font_11x18, 1);
+	  	          SSD1306_UpdateScreen();
+	  	          HAL_Delay(500);
+	  	      }
+	  	      else
+	  	      {
+	  	          // Close door
+	  	          __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 750); // ~0.5ms pulse width
+	  	          SSD1306_Clear();
+	  	          SSD1306_GotoXY(10, 20);
+	  	          SSD1306_Puts("Door Closed", &Font_11x18, 1);
+	  	          SSD1306_UpdateScreen();
+	  	          HAL_Delay(500);
+	  	      }
+    /* USER CODE END WHILE
+	  int x;
+	  		for(x=250; x<1250; x=x+1)
+	  		 {
+	  			__HAL_TIM_SET_COMPARE(&htim2,TIM_CHANNEL_2, x);
+	  			HAL_Delay(3);
+	  		 }*/
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
