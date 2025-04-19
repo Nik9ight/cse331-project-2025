@@ -1,6 +1,3 @@
-Sure! Here’s a polished `README.md` file you can use for your GitHub repo. It includes project description, setup, components, and more. Feel free to tweak the name or add images later.
-
----
 
 ```markdown
 # 🏠 STM32 Smart Sensing and Control System
@@ -52,11 +49,6 @@ This project is a smart sensing and control system developed using the **STM32F1
 
 ---
 
-## 🖼️ Screenshots
-
-> *(Add images of your OLED display and hardware setup here)*
-
----
 
 ## 📤 UART Communication Protocol
 
@@ -105,9 +97,3 @@ Feel free to fork and build on top of this project.
 - Based on STM32Cube HAL drivers
 - SSD1306 OLED library by [STemWin community fork]
 - DHT11 timing references from various STM32 tutorials
-
----
-
-```
-
-Let me know your GitHub username or repo name if you want this customized further (e.g., badges, links). Want me to generate an image for the OLED display output or circuit diagram too?
