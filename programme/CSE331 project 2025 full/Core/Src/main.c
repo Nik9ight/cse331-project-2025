@@ -45,7 +45,6 @@
 I2C_HandleTypeDef hi2c1;
 
 TIM_HandleTypeDef htim1;
-
 TIM_HandleTypeDef htim2;
 
 UART_HandleTypeDef huart1;
@@ -55,6 +54,8 @@ UART_HandleTypeDef huart1;
 #define TRIG_PORT GPIOB
 #define ECHO_PIN GPIO_PIN_8
 #define ECHO_PORT GPIOA
+//uint16_t pulse;
+//uint8_t angle
 uint32_t pMillis;
 uint32_t Value1 = 0;
 uint32_t Value2 = 0;
@@ -68,8 +69,8 @@ void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_I2C1_Init(void);
 static void MX_TIM1_Init(void);
-static void MX_USART1_UART_Init(void);
 static void MX_TIM2_Init(void);
+static void MX_USART1_UART_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -187,12 +188,6 @@ int main(void)
   MX_I2C1_Init();
   MX_TIM1_Init();
   MX_TIM2_Init();
-  // In main() function, BEFORE the while(1) loop
-  if (HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_2) != HAL_OK)
-  {
-    // PWM Generation Error - Add error handling here if needed
-    Error_Handler();
-  }
   MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
   HAL_TIM_Base_Start(&htim1);
@@ -216,109 +211,104 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
-
-	  // DHT11
-
 	  if(DHT11_Start())
-	  	      {
-	  	        RHI = DHT11_Read(); // Relative humidity integral
-	  	        RHD = DHT11_Read(); // Relative humidity decimal
-	  	        TCI = DHT11_Read(); // Celsius integral
-	  	        TCD = DHT11_Read(); // Celsius decimal
-	  	        SUM = DHT11_Read(); // Check sum
-	  	        if (RHI + RHD + TCI + TCD == SUM)
-	  	        {
+	  	  	  	      {
+	  	  	  	        RHI = DHT11_Read(); // Relative humidity integral
+	  	  	  	        RHD = DHT11_Read(); // Relative humidity decimal
+	  	  	  	        TCI = DHT11_Read(); // Celsius integral
+	  	  	  	        TCD = DHT11_Read(); // Celsius decimal
+	  	  	  	        SUM = DHT11_Read(); // Check sum
+	  	  	  	        if (RHI + RHD + TCI + TCD == SUM)
+	  	  	  	        {
 
-	  	          tCelsius = (float)TCI + (float)(TCD/10.0);
-	  	          tFahrenheit = tCelsius * 9/5 + 32;
-	  	          RH = (float)RHI + (float)(RHD/10.0);
-
-
-	  	          SSD1306_Clear();
-
-	  	                  sprintf(strCopy1,"Temp: %d.%d C", TCI, TCD);
-	  	                  SSD1306_GotoXY(0, 0);
-	  	                  SSD1306_Puts(strCopy1, &Font_7x10, 1);
-
-	  	                  sprintf(strCopy2,"Humidity: %d.%d %%", RHI, RHD);
-	  	                  SSD1306_GotoXY(0, 20);
-	  	                  SSD1306_Puts(strCopy2, &Font_7x10, 1);
-
-	  	                  SSD1306_UpdateScreen();
-
-	  	        }
-
-	  	      }
-	  	     // HAL_Delay(50);
-	  //Ultrasonic
-
-	  HAL_GPIO_WritePin(TRIG_PORT, TRIG_PIN, GPIO_PIN_SET);  // pull the TRIG pin HIGH
-	      __HAL_TIM_SET_COUNTER(&htim1, 0);
-	      while (__HAL_TIM_GET_COUNTER (&htim1) < 10);  // wait for 10 us
-	      HAL_GPIO_WritePin(TRIG_PORT, TRIG_PIN, GPIO_PIN_RESET);  // pull the TRIG pin low
-
-	      pMillis = HAL_GetTick(); // used this to avoid infinite while loop  (for timeout)
-	      // wait for the echo pin to go high
-	      while (!(HAL_GPIO_ReadPin (ECHO_PORT, ECHO_PIN)) && pMillis + 10 >  HAL_GetTick());
-	      Value1 = __HAL_TIM_GET_COUNTER (&htim1);
-
-	      pMillis = HAL_GetTick(); // used this to avoid infinite while loop (for timeout)
-	      // wait for the echo pin to go low
-	      while ((HAL_GPIO_ReadPin (ECHO_PORT, ECHO_PIN)) && pMillis + 50 > HAL_GetTick());
-	      Value2 = __HAL_TIM_GET_COUNTER (&htim1);
-
-	      Distance = (Value2-Value1)* 0.034/2;
-
-	      SSD1306_GotoXY (0, 40);
-	      SSD1306_Puts ("Distance:", &Font_7x10, 1);
-	      sprintf(strCopy,"%d    ", Distance);
-	      SSD1306_GotoXY (63, 40);
-	      SSD1306_Puts (strCopy, &Font_7x10, 1);
-	      SSD1306_UpdateScreen();
+	  	  	  	          tCelsius = (float)TCI + (float)(TCD/10.0);
+	  	  	  	          tFahrenheit = tCelsius * 9/5 + 32;
+	  	  	  	          RH = (float)RHI + (float)(RHD/10.0);
 
 
-	      //servo motor and IR
+	  	  	  	          SSD1306_Clear();
+
+	  	  	  	                  sprintf(strCopy1,"Temp: %d.%d C", TCI, TCD);
+	  	  	  	                  SSD1306_GotoXY(0, 0);
+	  	  	  	                  SSD1306_Puts(strCopy1, &Font_7x10, 1);
+
+	  	  	  	                  sprintf(strCopy2,"Humidity: %d.%d %%", RHI, RHD);
+	  	  	  	                  SSD1306_GotoXY(0, 20);
+	  	  	  	                  SSD1306_Puts(strCopy2, &Font_7x10, 1);
+
+	  	  	  	                  SSD1306_UpdateScreen();
+
+	  	  	  	        }
+
+	  	  	  	      }
+	  	  	  	     // HAL_Delay(50);
+	  	  	  //Ultrasonic
+
+	  	  	  HAL_GPIO_WritePin(TRIG_PORT, TRIG_PIN, GPIO_PIN_SET);  // pull the TRIG pin HIGH
+	  	  	      __HAL_TIM_SET_COUNTER(&htim1, 0);
+	  	  	      while (__HAL_TIM_GET_COUNTER (&htim1) < 10);  // wait for 10 us
+	  	  	      HAL_GPIO_WritePin(TRIG_PORT, TRIG_PIN, GPIO_PIN_RESET);  // pull the TRIG pin low
+
+	  	  	      pMillis = HAL_GetTick(); // used this to avoid infinite while loop  (for timeout)
+	  	  	      // wait for the echo pin to go high
+	  	  	      while (!(HAL_GPIO_ReadPin (ECHO_PORT, ECHO_PIN)) && pMillis + 10 >  HAL_GetTick());
+	  	  	      Value1 = __HAL_TIM_GET_COUNTER (&htim1);
+
+	  	  	      pMillis = HAL_GetTick(); // used this to avoid infinite while loop (for timeout)
+	  	  	      // wait for the echo pin to go low
+	  	  	      while ((HAL_GPIO_ReadPin (ECHO_PORT, ECHO_PIN)) && pMillis + 50 > HAL_GetTick());
+	  	  	      Value2 = __HAL_TIM_GET_COUNTER (&htim1);
+
+	  	  	      Distance = (Value2-Value1)* 0.034/2;
+
+	  	  	      SSD1306_GotoXY (0, 40);
+	  	  	      SSD1306_Puts ("Distance:", &Font_7x10, 1);
+	  	  	      sprintf(strCopy,"%d    ", Distance);
+	  	  	      SSD1306_GotoXY (63, 40);
+	  	  	      SSD1306_Puts (strCopy, &Font_7x10, 1);
+	  	  	      SSD1306_UpdateScreen();
 
 
-
-	      if (HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0) == GPIO_PIN_RESET) // Active LOW: Presence detected
-	  	      {
-	  	          // Open door
-	  	          __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 250);
-
-	  	       	  	          SSD1306_GotoXY(0, 50);
-	  	       	  	          SSD1306_Puts("Door Open", &Font_7x10, 1);
-	  	       	  	          SSD1306_UpdateScreen();
-	  	       	  	          HAL_Delay(500);
-
-	  	      }
-	  	      else
-	  	      {
-	  	          // Close door
-	  	          __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 750);
-
-	  	       	  	          SSD1306_GotoXY(0, 50);
-	  	       	  	          SSD1306_Puts("Door Closed", &Font_7x10, 1);
-	  	       	  	          SSD1306_UpdateScreen();
-	  	       	  	          HAL_Delay(500);
-
-	  	      }
+	  	  	      //servo motor and IR
 
 
 
-	      //UART1
+	  	  	      if (HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0) == GPIO_PIN_RESET) // Active LOW: Presence detected
+	  	  	  	      {
+	  	  	  	          // Open door
+	  	  	  	          __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 2500);
 
-	      if(HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_1) == GPIO_PIN_RESET)
-	     	      {
-	     	        charToTransmit[0] = 48; // 48 is ascii character for zero
-	     	      }
-	     	      else
-	     	      {
-	     	        charToTransmit[0] = 49; // 49 is ascii character for one
-	     	      }
-	     	      HAL_UART_Transmit(&huart1, charToTransmit, 1, 100);
+	  	  	  	       	  	          SSD1306_GotoXY(0, 50);
+	  	  	  	       	  	          SSD1306_Puts("Door Open", &Font_7x10, 1);
+	  	  	  	       	  	          SSD1306_UpdateScreen();
+	  	  	  	       	  	          HAL_Delay(500);
 
-	      //HAL_Delay(500);
+	  	  	  	      }
+	  	  	  	      else
+	  	  	  	      {
+	  	  	  	          // Close door
+	  	  	  	          __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 1500);
+
+	  	  	  	       	  	          SSD1306_GotoXY(0, 50);
+	  	  	  	       	  	          SSD1306_Puts("Door Closed", &Font_7x10, 1);
+	  	  	  	       	  	          SSD1306_UpdateScreen();
+	  	  	  	       	  	          HAL_Delay(500);
+
+	  	  	  	      }
+
+
+
+	  	  	      //UART1
+
+	  	  	      if(HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_1) == GPIO_PIN_RESET)
+	  	  	     	      {
+	  	  	     	        charToTransmit[0] = 48; // 48 is ascii character for zero
+	  	  	     	      }
+	  	  	     	      else
+	  	  	     	      {
+	  	  	     	        charToTransmit[0] = 49; // 49 is ascii character for one
+	  	  	     	      }
+	  	  	     	      HAL_UART_Transmit(&huart1, charToTransmit, 1, 100);
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
@@ -444,78 +434,10 @@ static void MX_TIM1_Init(void)
 }
 
 /**
-  * @brief GPIO Initialization Function
+  * @brief TIM2 Initialization Function
   * @param None
   * @retval None
   */
-static void MX_GPIO_Init(void)
-{
-  GPIO_InitTypeDef GPIO_InitStruct = {0};
-  /* USER CODE BEGIN MX_GPIO_Init_1 */
-
-  /* USER CODE END MX_GPIO_Init_1 */
-
-  /* GPIO Ports Clock Enable */
-  __HAL_RCC_GPIOD_CLK_ENABLE();
-  __HAL_RCC_GPIOB_CLK_ENABLE();
-  __HAL_RCC_GPIOA_CLK_ENABLE();
-
-  /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_15, GPIO_PIN_RESET);
-
-  /*Configure GPIO pin : PB15 */
-  GPIO_InitStruct.Pin = GPIO_PIN_15;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
-
-  /*Configure GPIO pin : PA8 */
-  GPIO_InitStruct.Pin = GPIO_PIN_8;
-  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-
-  /*Configure GPIO pin : PA0 */
-    GPIO_InitStruct.Pin = GPIO_PIN_0;
-    GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-    GPIO_InitStruct.Pull = GPIO_NOPULL;
-    HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-
-  /* USER CODE BEGIN MX_GPIO_Init_2 */
-
-  /* USER CODE END MX_GPIO_Init_2 */
-}
-
-/* USER CODE BEGIN 4 */
-static void MX_USART1_UART_Init(void)
-{
-
-  /* USER CODE BEGIN USART1_Init 0 */
-
-  /* USER CODE END USART1_Init 0 */
-
-  /* USER CODE BEGIN USART1_Init 1 */
-
-  /* USER CODE END USART1_Init 1 */
-  huart1.Instance = USART1;
-  huart1.Init.BaudRate = 9600;
-  huart1.Init.WordLength = UART_WORDLENGTH_8B;
-  huart1.Init.StopBits = UART_STOPBITS_1;
-  huart1.Init.Parity = UART_PARITY_NONE;
-  huart1.Init.Mode = UART_MODE_TX_RX;
-  huart1.Init.HwFlowCtl = UART_HWCONTROL_NONE;
-  huart1.Init.OverSampling = UART_OVERSAMPLING_16;
-  if (HAL_UART_Init(&huart1) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  /* USER CODE BEGIN USART1_Init 2 */
-
-  /* USER CODE END USART1_Init 2 */
-
-}
-
 static void MX_TIM2_Init(void)
 {
 
@@ -531,7 +453,7 @@ static void MX_TIM2_Init(void)
 
   /* USER CODE END TIM2_Init 1 */
   htim2.Instance = TIM2;
-  htim2.Init.Prescaler = 15;
+  htim2.Init.Prescaler = 71;
   htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
   htim2.Init.Period = 9999;
   htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
@@ -569,6 +491,94 @@ static void MX_TIM2_Init(void)
   HAL_TIM_MspPostInit(&htim2);
 
 }
+
+/**
+  * @brief USART1 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_USART1_UART_Init(void)
+{
+
+  /* USER CODE BEGIN USART1_Init 0 */
+
+  /* USER CODE END USART1_Init 0 */
+
+  /* USER CODE BEGIN USART1_Init 1 */
+
+  /* USER CODE END USART1_Init 1 */
+  huart1.Instance = USART1;
+  huart1.Init.BaudRate = 9600;
+  huart1.Init.WordLength = UART_WORDLENGTH_8B;
+  huart1.Init.StopBits = UART_STOPBITS_1;
+  huart1.Init.Parity = UART_PARITY_NONE;
+  huart1.Init.Mode = UART_MODE_TX_RX;
+  huart1.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+  huart1.Init.OverSampling = UART_OVERSAMPLING_16;
+  if (HAL_UART_Init(&huart1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN USART1_Init 2 */
+
+  /* USER CODE END USART1_Init 2 */
+
+}
+
+/**
+  * @brief GPIO Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_GPIO_Init(void)
+{
+  GPIO_InitTypeDef GPIO_InitStruct = {0};
+  /* USER CODE BEGIN MX_GPIO_Init_1 */
+
+  /* USER CODE END MX_GPIO_Init_1 */
+
+  /* GPIO Ports Clock Enable */
+  __HAL_RCC_GPIOD_CLK_ENABLE();
+  __HAL_RCC_GPIOA_CLK_ENABLE();
+  __HAL_RCC_GPIOB_CLK_ENABLE();
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_15, GPIO_PIN_RESET);
+
+  /*Configure GPIO pins : PA0 PA8 */
+  GPIO_InitStruct.Pin = GPIO_PIN_0|GPIO_PIN_8;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : PB1 */
+  GPIO_InitStruct.Pin = GPIO_PIN_1;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : PB15 */
+  GPIO_InitStruct.Pin = GPIO_PIN_15;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
+  /* USER CODE BEGIN MX_GPIO_Init_2 */
+
+  /* USER CODE END MX_GPIO_Init_2 */
+}
+
+/* USER CODE BEGIN 4 */
+/*void Servo_Set_Angle(uint8_t angle)
+{
+
+	uint16_t pulse = (angle * 2000 / 180) + 500;
+
+	HAL_TIM SET_COMPARE(&htim2, TIM_CHANNEL_2, pulse);
+
+}*/
+
 /* USER CODE END 4 */
 
 /**
@@ -602,5 +612,3 @@ void assert_failed(uint8_t *file, uint32_t line)
   /* USER CODE END 6 */
 }
 #endif /* USE_FULL_ASSERT */
-
-
